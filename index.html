@@ -1,0 +1,253 @@
+<html>
+  <head>
+    <!--<script src="script.js"><script>-->
+
+	<style>
+
+        #title{
+            background-color: #FFFFFF;
+            text-align: center;
+            text-decoration: none;
+            letter-spacing: 3px;
+            line-height: 5.0;
+            word-spacing: 10px;
+            text-shadow: 3px 2px gray;
+            font-size: 72px;
+        }
+
+		#header {
+			background-color: #FF2F2F;
+			width:  100%;
+			height: 150px;
+		}
+		#left {
+			background-color: #FF2F2F;
+			float: left;
+			width: 50%;
+			height: 250px;
+		}
+		#right {
+			background-color: #FF2F2F;
+			float: right;
+			width: 50%;
+			height: 250px;
+		}
+
+        .topleft {
+            position: absolute;
+            top: 450px;
+            left: 50px;
+            font-size: 18px;
+        }
+
+        .middleleft {
+            position: absolute;
+            top:275px;
+            left: 200px;
+            font-size:18px;
+        }
+
+        .middleright{
+            position: absolute;
+            top:275px;
+            left: 1000px;
+            font-size:18px
+        }
+
+        .button {
+            position: relative;
+            background-color: #075387;
+            border: none;
+            font-size: 18px;
+            color: #FFFFFF;
+            padding: 05px;
+            width: 100px;
+            left: 7px;
+            text-align: center;
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            text-decoration: none;
+            overflow: hidden;
+            cursor: pointer;
+            border-radius: 05px;
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+        }
+
+        .button:after {
+            content: "";
+            background: #f1f1f1;
+            display: block;
+            position: absolute;
+            padding-top: 300%;
+            padding-left: 350%;
+            margin-left: -20px !important;
+            margin-top: -120%;
+            opacity: 0;
+            transition: all 0.8s
+        }
+
+       .button:active:after {
+            padding: 0;
+            margin: 0;
+            opacity: 1;
+            transition: 0s
+        }
+
+        .search {
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            text-align: center;
+            background-color:#FF2F2F;
+            text-decoration: none;
+            letter-spacing: 3px;
+            line-height: 1.0;
+            word-spacing: 10px;
+            font-size: 42px;
+            font-weight: bold;
+            font-style: oblique;
+        }
+
+
+	</style>
+</script>
+    <div id="title"> Trendy Stocks </div>
+  <body>
+    <img  id="image" src=""></img>
+    <div class="topleft"><div class="search"><span> Trends in: </span><input id="search"><button class="button"onclick="doSearch();">Go!</button></button></div></div>
+    <hr>
+    <script type="text/javascript">
+      function doSearch()
+      {
+        var searchString = document.getElementById('search').value;
+        var request = new XMLHttpRequest();
+        parseString = 'https://api.iextrading.com/1.0/stock/' + searchString + '/company';
+        var coolString = '';
+        request.open('GET', parseString);
+        request.onload = function ()
+        {
+            var companyData = JSON.parse(this.response);
+            coolString = coolString + companyData.companyName + '\n' + companyData.industry + ' Industry\n' + 'Website: ' + companyData.website + '\n' + companyData.description + '\n\n';
+        }
+        request.send();
+
+        parseString = 'https://api.iextrading.com/1.0/stock/' + searchString + '/logo';
+        var request1 = new XMLHttpRequest();
+        request1.open('GET', parseString);
+        request1.onload = function ()
+        {
+          try
+          {
+            var logoData = JSON.parse(this.response);
+            document.getElementById('image').setAttribute('src', logoData.url);
+          }
+          catch (e)
+           {
+             document.getElementById('image').setAttribute('src', '');
+
+           }
+
+        }
+        request1.send();
+
+        var request2 = new XMLHttpRequest();
+        parseString = 'https://api.iextrading.com/1.0/stock/' + searchString + '/chart/5y';
+        request2.open('GET', parseString);
+        request2.onload = function ()
+        {
+            try
+            {
+              var trendData = JSON.parse(this.response);
+              var today = trendData.length - 1;
+              coolString = coolString + 'Pricing information for:\n\nToday:\nOpening: ' + trendData[today].open + '\nLow: ' + trendData[today].low + '\nHigh: ' + trendData[today].high + '\nClosing: ' + trendData[today].close + '\nDaily Percent Change: ' + trendData[today].changePercent + '%\n\n';
+
+              var lastWeek = today - 7;
+              var lastMonth = today - 31;
+              var lastYear = today - 365;
+
+              var lastWeekLow = trendData[today].low;
+              var lastWeekHigh = trendData[today].high;
+              var lastWeekPercentChange = 0.0;
+              var lastMonthLow = trendData[today].low;
+              var lastMonthHigh = trendData[today].high;
+              var lastMonthPercentChange = 0.0;
+              var lastYearLow = trendData[today].low;
+              var lastYearHigh = trendData[today].high;
+              var lastYearPercentChange = 0.0;
+
+              if (lastWeek >= 0)
+              {
+                for (var i = lastWeek; i <= today; i++)
+                {
+                  if (trendData[i].high > lastWeekHigh)
+                  {
+                    lastWeekHigh = trendData[i].high;
+                  }
+                  if (trendData[i].low < lastWeekLow)
+                  {
+                    lastWeekLow = trendData[i].low;
+                  }
+                }
+                lastWeekPercentChange = (trendData[today].close - trendData[lastWeek].open) / trendData[lastWeek].open * 100;
+                lastWeekPercentChange = Math.round(lastWeekPercentChange * 1000) / 1000.0;
+                coolString = coolString + 'Last Week:\nLow: ' + lastWeekLow + '\nHigh: ' + lastWeekHigh + '\nWeekly Percent Change: ' + lastWeekPercentChange + '%\n\n';
+
+              }
+
+              if (lastMonth >= 0)
+              {
+                for (var i = lastMonth; i <= today; i++)
+                {
+                  if (trendData[i].high > lastMonthHigh)
+                  {
+                    lastMonthHigh = trendData[i].high;
+                  }
+                  if (trendData[i].low < lastMonthLow)
+                  {
+                    lastMonthLow = trendData[i].low;
+                  }
+                }
+                lastMonthPercentChange = (trendData[today].close - trendData[lastMonth].open) / trendData[lastMonth].open * 100;
+                lastMonthPercentChange = Math.round(lastMonthPercentChange * 1000) / 1000.0;
+                coolString = coolString + 'Last Month:\nLow: ' + lastMonthLow + '\nHigh: ' + lastMonthHigh + '\nMonthly Percent Change: ' + lastMonthPercentChange + '%\n\n';
+
+              }
+
+              if (lastYear >= 0)
+              {
+                for (var i = lastYear; i <= today; i++)
+                {
+                  if (trendData[i].high > lastYearHigh)
+                  {
+                    lastYearHigh = trendData[i].high;
+                  }
+                  if (trendData[i].low < lastYearLow)
+                  {
+                    lastYearLow = trendData[i].low;
+                  }
+                }
+                lastYearPercentChange = (trendData[today].close - trendData[lastYear].open) / trendData[lastYear].open * 100;
+                lastYearPercentChange = Math.round(lastYearPercentChange * 1000) / 1000.0;
+                coolString = coolString + 'Last Year:\nLow: ' + lastYearLow + '\nHigh: ' + lastYearHigh + '\nYearly Percent Change: ' + lastYearPercentChange + '%\n\n';
+
+              }
+            }
+            catch (e)
+            {
+              coolString = '';
+              alert('Stock \'' + searchString + '\' does not exist');
+            }
+
+
+
+
+            document.getElementById('left').innerText = coolString;
+        }
+        request2.send();
+
+      }
+    </script>
+    <div id="header"></div>
+  <div id="left"></div>
+  <div id="right"></div>
+  </body>
+  </head>
+</html>
