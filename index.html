@@ -3,7 +3,6 @@
     <!--<script src="script.js"><script>-->
 
 	<style>
-
         #title{
             background-color: #FFFFFF;
             text-align: center;
@@ -14,7 +13,6 @@
             text-shadow: 3px 2px gray;
             font-size: 72px;
         }
-
 		#header {
 			background-color: #FF2F2F;
 			width:  100%;
@@ -32,28 +30,24 @@
 			width: 50%;
 			height: 250px;
 		}
-
         .topleft {
             position: absolute;
             top: 450px;
             left: 50px;
             font-size: 18px;
         }
-
         .middleleft {
             position: absolute;
             top:275px;
             left: 200px;
             font-size:18px;
         }
-
         .middleright{
             position: absolute;
             top:275px;
             left: 1000px;
             font-size:18px
         }
-
         .button {
             position: relative;
             background-color: #075387;
@@ -72,7 +66,6 @@
             border-radius: 05px;
             box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
         }
-
         .button:after {
             content: "";
             background: #f1f1f1;
@@ -85,14 +78,12 @@
             opacity: 0;
             transition: all 0.8s
         }
-
        .button:active:after {
             padding: 0;
             margin: 0;
             opacity: 1;
             transition: 0s
         }
-
         .search {
             box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
             text-align: center;
@@ -105,8 +96,6 @@
             font-weight: bold;
             font-style: oblique;
         }
-
-
 	</style>
 </script>
     <div id="title"> Trendy Stocks </div>
@@ -128,7 +117,6 @@
             coolString = coolString + companyData.companyName + '\n' + companyData.industry + ' Industry\n' + 'Website: ' + companyData.website + '\n' + companyData.description + '\n\n';
         }
         request.send();
-
         parseString = 'https://api.iextrading.com/1.0/stock/' + searchString + '/logo';
         var request1 = new XMLHttpRequest();
         request1.open('GET', parseString);
@@ -142,12 +130,9 @@
           catch (e)
            {
              document.getElementById('image').setAttribute('src', '');
-
            }
-
         }
         request1.send();
-
         var request2 = new XMLHttpRequest();
         parseString = 'https://api.iextrading.com/1.0/stock/' + searchString + '/chart/5y';
         request2.open('GET', parseString);
@@ -158,11 +143,9 @@
               var trendData = JSON.parse(this.response);
               var today = trendData.length - 1;
               coolString = coolString + 'Pricing information for:\n\nToday:\nOpening: ' + trendData[today].open + '\nLow: ' + trendData[today].low + '\nHigh: ' + trendData[today].high + '\nClosing: ' + trendData[today].close + '\nDaily Percent Change: ' + trendData[today].changePercent + '%\n\n';
-
               var lastWeek = today - 7;
               var lastMonth = today - 31;
               var lastYear = today - 365;
-
               var lastWeekLow = trendData[today].low;
               var lastWeekHigh = trendData[today].high;
               var lastWeekPercentChange = 0.0;
@@ -172,7 +155,6 @@
               var lastYearLow = trendData[today].low;
               var lastYearHigh = trendData[today].high;
               var lastYearPercentChange = 0.0;
-
               if (lastWeek >= 0)
               {
                 for (var i = lastWeek; i <= today; i++)
@@ -189,9 +171,7 @@
                 lastWeekPercentChange = (trendData[today].close - trendData[lastWeek].open) / trendData[lastWeek].open * 100;
                 lastWeekPercentChange = Math.round(lastWeekPercentChange * 1000) / 1000.0;
                 coolString = coolString + 'Last Week:\nLow: ' + lastWeekLow + '\nHigh: ' + lastWeekHigh + '\nWeekly Percent Change: ' + lastWeekPercentChange + '%\n\n';
-
               }
-
               if (lastMonth >= 0)
               {
                 for (var i = lastMonth; i <= today; i++)
@@ -208,9 +188,7 @@
                 lastMonthPercentChange = (trendData[today].close - trendData[lastMonth].open) / trendData[lastMonth].open * 100;
                 lastMonthPercentChange = Math.round(lastMonthPercentChange * 1000) / 1000.0;
                 coolString = coolString + 'Last Month:\nLow: ' + lastMonthLow + '\nHigh: ' + lastMonthHigh + '\nMonthly Percent Change: ' + lastMonthPercentChange + '%\n\n';
-
               }
-
               if (lastYear >= 0)
               {
                 for (var i = lastYear; i <= today; i++)
@@ -227,7 +205,6 @@
                 lastYearPercentChange = (trendData[today].close - trendData[lastYear].open) / trendData[lastYear].open * 100;
                 lastYearPercentChange = Math.round(lastYearPercentChange * 1000) / 1000.0;
                 coolString = coolString + 'Last Year:\nLow: ' + lastYearLow + '\nHigh: ' + lastYearHigh + '\nYearly Percent Change: ' + lastYearPercentChange + '%\n\n';
-
               }
             }
             catch (e)
@@ -235,26 +212,55 @@
               coolString = '';
               alert('Stock \'' + searchString + '\' does not exist');
             }
-
-
-
-
             document.getElementById('left').innerText = coolString;
         }
         request2.send();
 
         parseString = 'https://api.iextrading.com/1.0/stock/' + searchString + '/news';
+        var newsString = 'Recent News Related to ' + searchString + ' Stock:\n\n';
+        var request3 = new XMLHttpRequest();
+        request3.open('GET', parseString);
+        request3.onload = function ()
+        {
+          try
+          {
+            var newsData = JSON.parse(this.response);
+            document.getElementById('right').innerText = newsString;
+            for (var i = 0; i < newsData.length - 1; i++)
+            {
+              var date = document.createElement('a');
+              date.textContent = newsData[i].datetime.substring(0, 10) + ' ';
 
+              var link = document.createElement('a');
+              link.textContent = newsData[i].source + ": " + newsData[i].headline;
+              link.href = newsData[i].url;
+
+              var space = document.createElement('p');
+              space.textContent = '\n';
+
+              document.getElementById('right').appendChild(date);
+              document.getElementById('right').appendChild(link);
+              document.getElementById('right').appendChild(space);
+
+
+            }
+          }
+          catch (e)
+          {
+            newsString = '';
+            document.getElementById('right').innerText = newsString;
+          }
+
+        }
+        request3.send();
 
       }
-
       document.getElementById("mySearch").addEventListener("keyup", function(event) {
     event.preventDefault();
     if (event.keyCode === 13) {
         document.getElementById("myButton").click();
     }
 });
-
     </script>
     <div id="header"></div>
   <div id="left"></div>
