@@ -112,7 +112,7 @@
     <div id="title"> Trendy Stocks </div>
   <body>
     <img  id="image" src=""></img>
-    <div class="topleft"><div class="search"><span> Trends in: </span><input id="search"><button class="button"onclick="doSearch();">Go!</button></button></div></div>
+    <div class="topleft"><div id="mySearch" class="search"><span> Trends in: </span><input id="search"><button id="myButton" class="button"onclick="doSearch();">Go!</button></button></div></div>
     <hr>
     <script type="text/javascript">
       function doSearch()
@@ -243,7 +243,18 @@
         }
         request2.send();
 
+        parseString = 'https://api.iextrading.com/1.0/stock/' + searchString + '/news';
+
+
       }
+
+      document.getElementById("mySearch").addEventListener("keyup", function(event) {
+    event.preventDefault();
+    if (event.keyCode === 13) {
+        document.getElementById("myButton").click();
+    }
+});
+
     </script>
     <div id="header"></div>
   <div id="left"></div>
